@@ -1400,9 +1400,12 @@ const questions = {
             const container = document.getElementById('questionsContainer');
             const totalQuestions = questions[currentLanguage].length;
             const t = translations[currentLanguage];
-            
-            container.style.transform = `translateY(-${currentQuestion * 100}vh)`;
-            
+
+            // Get actual slide height from the first slide element
+            const firstSlide = container.querySelector('.question-slide');
+            const slideHeight = firstSlide ? firstSlide.offsetHeight : (window.innerHeight - 80);
+            container.style.transform = `translateY(-${currentQuestion * slideHeight}px)`;
+
             // Update progress
             const progress = ((currentQuestion) / (totalQuestions + 1)) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
@@ -1498,6 +1501,11 @@ const questions = {
                 e.preventDefault();
                 previousQuestion();
             }
+        });
+
+        // Handle window resize to recalculate slide positions
+        window.addEventListener('resize', () => {
+            updateView();
         });
 
         // Initialize
