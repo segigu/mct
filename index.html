@@ -1396,28 +1396,48 @@ const questions = {
             updateView();
         }
 
+        // Store initial viewport height to handle mobile keyboard issues
+        let initialViewportHeight = window.innerHeight;
+
         function updateView() {
             const container = document.getElementById('questionsContainer');
             const totalQuestions = questions[currentLanguage].length;
             const t = translations[currentLanguage];
 
             // Get actual slide height from the first slide element
+            // Use stored initial height if current height is significantly different (keyboard is likely open)
             const firstSlide = container.querySelector('.question-slide');
-            const slideHeight = firstSlide ? firstSlide.offsetHeight : (window.innerHeight - 80);
+            let slideHeight;
+
+            if (firstSlide) {
+                // If viewport height has changed significantly (keyboard opened), use initial height
+                // This prevents layout shifts when keyboard is open
+                const currentHeight = window.innerHeight;
+                if (Math.abs(currentHeight - initialViewportHeight) > 100) {
+                    slideHeight = initialViewportHeight - 80;
+                } else {
+                    slideHeight = firstSlide.offsetHeight;
+                    // Update initial height reference when stable
+                    initialViewportHeight = currentHeight;
+                }
+            } else {
+                slideHeight = initialViewportHeight - 80;
+            }
+
             container.style.transform = `translateY(-${currentQuestion * slideHeight}px)`;
 
             // Update progress
             const progress = ((currentQuestion) / (totalQuestions + 1)) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
-            
+
             // Update buttons
             document.getElementById('prevBtn').disabled = currentQuestion === 0;
             document.querySelector('.nav-text').textContent = t.prevBtn;
             document.querySelectorAll('.nav-text')[1].textContent = t.nextBtn;
-            
+
             const nextBtn = document.getElementById('nextBtn');
             const enterHint = document.querySelector('.enter-hint');
-            
+
             if (currentQuestion >= totalQuestions) {
                 nextBtn.style.display = 'none';
                 enterHint.style.display = 'none';
@@ -1506,6 +1526,27 @@ const questions = {
         // Handle window resize to recalculate slide positions
         window.addEventListener('resize', () => {
             updateView();
+        });
+
+        // Fix for mobile keyboard: recalculate layout when input fields lose focus
+        // This ensures the layout returns to normal when the keyboard closes
+        document.addEventListener('focusout', (e) => {
+            if (e.target.matches('.answer-input')) {
+                // Use setTimeout to allow the keyboard to fully close before recalculating
+                setTimeout(() => {
+                    updateView();
+                }, 150);
+            }
+        });
+
+        // Also handle when input fields gain focus for better stability
+        document.addEventListener('focusin', (e) => {
+            if (e.target.matches('.answer-input')) {
+                // Small delay to allow keyboard animation to complete
+                setTimeout(() => {
+                    updateView();
+                }, 100);
+            }
         });
 
         // Initialize
