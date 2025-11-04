@@ -119,20 +119,6 @@
             line-height: 1.3;
         }
 
-        .question-reason {
-            font-size: 15px;
-            color: #666;
-            background: #f8f8f8;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 32px;
-            border-left: 3px solid #CC785C;
-        }
-
-        .question-reason strong {
-            color: #CC785C;
-        }
-
         .answer-input {
             width: 100%;
             padding: 16px 0;
@@ -361,12 +347,6 @@
                 margin-bottom: 12px;
             }
 
-            .question-reason {
-                font-size: 13px;
-                padding: 10px 12px;
-                margin-bottom: 24px;
-            }
-
             .option {
                 font-size: 16px;
                 padding: 16px 20px;
@@ -471,154 +451,113 @@
         let currentLanguage = 'ru';
         const answers = {};
 
-        const questions = {
+const questions = {
             ru: [
-                // Секция 1: Версионирование устройств
                 {
                     type: 'radio',
                     title: 'Существуют ли различные аппаратные ревизии MCT Unit?',
-                    reason: 'Корректная идентификация устройств и определение совместимости прошивок.',
                     options: ['Да', 'Нет', 'Не знаю']
                 },
                 {
                     type: 'text',
-                    title: 'Используются ли номера моделей или аппаратные версии (например: v1.0, v2.0, Rev.A, Rev.B)?',
-                    reason: 'Корректная идентификация устройств и определение совместимости прошивок.',
+                    title: 'Если да, перечислите какие (например: Rev.A, Rev.B, v1.0, v2.0)',
                     placeholder: 'Введите версии через запятую'
                 },
                 {
                     type: 'checkbox',
-                    title: 'Как определить аппаратную версию конкретного устройства?',
-                    reason: 'Корректная идентификация устройств и определение совместимости прошивок.',
+                    title: 'Как можно определить аппаратную версию устройства?',
                     options: [
-                        'Серийный номер',
-                        'Маркировка на корпусе',
-                        'Отображение на экране',
+                        'По серийному номеру',
+                        'По маркировке на корпусе',
+                        'На экране устройства',
                         'В меню настроек',
-                        'Из документации',
+                        'По документации',
                         'Другое'
                     ]
                 },
                 {
                     type: 'radio',
                     title: 'Влияет ли аппаратная версия на совместимость с прошивками?',
-                    reason: 'Корректная идентификация устройств и определение совместимости прошивок.',
                     options: ['Да, значительно влияет', 'Частично влияет', 'Не влияет', 'Не знаю']
                 },
-                
-                // Секция 2: Схема нумерации прошивок
                 {
                     type: 'text',
                     title: 'Какой официальный формат используется для версий прошивок?',
-                    reason: 'Правильная интерпретация версий, их сортировка и отображение в системе.',
                     placeholder: 'Например: V[MM][YY], major.minor.patch'
                 },
                 {
                     type: 'radio',
                     title: 'Версия V0923 предполагает формат V[MM][YY] (месяц-год). Это корректно?',
-                    reason: 'Правильная интерпретация версий, их сортировка и отображение в системе.',
                     options: ['Да, корректно', 'Нет, формат другой', 'Частично корректно']
                 },
                 {
                     type: 'textarea',
                     title: 'Какие версии прошивок существуют на данный момент?',
-                    reason: 'Правильная интерпретация версий, их сортировка и отображение в системе.',
                     placeholder: 'Перечислите все известные версии...'
                 },
                 {
                     type: 'radio',
                     title: 'Используются ли patch-версии внутри периода (например, V0923.1, V0923.2)?',
-                    reason: 'Правильная интерпретация версий, их сортировка и отображение в системе.',
                     options: ['Да', 'Нет', 'Планируется']
                 },
                 {
                     type: 'radio',
                     title: 'Применяется ли семантическое версионирование (major.minor.patch)?',
-                    reason: 'Правильная интерпретация версий, их сортировка и отображение в системе.',
                     options: ['Да', 'Нет', 'Частично']
                 },
-                
-                // Секция 3: Модели устройств
                 {
                     type: 'textarea',
-                    title: 'Какие модели устройств MCT Unit существуют на текущий момент?',
-                    reason: 'Построение справочника моделей и определение совместимости.',
-                    placeholder: 'Перечислите все модели с официальными названиями...'
-                },
-                {
-                    type: 'text',
-                    title: 'Как правильно называются эти модели?',
-                    reason: 'Построение справочника моделей и определение совместимости.',
-                    placeholder: 'Официальные наименования моделей'
+                    title: 'Какие модели устройств MCT Unit существуют?',
+                    placeholder: 'Перечислите все модели с их официальными названиями...'
                 },
                 {
                     type: 'radio',
                     title: 'Планируются ли выпуски новых моделей в ближайшее время?',
-                    reason: 'Построение справочника моделей и определение совместимости.',
                     options: ['Да, в этом году', 'Да, в следующем году', 'Нет', 'Не знаю']
                 },
                 {
                     type: 'textarea',
-                    title: 'В чём ключевые различия между моделями (если есть)?',
-                    reason: 'Построение справочника моделей и определение совместимости.',
+                    title: 'В чём ключевые различия между моделями?',
                     placeholder: 'Опишите технические и функциональные различия...'
                 },
-                
-                // Секция 4: Матрица совместимости
                 {
                     type: 'textarea',
                     title: 'Какие прошивки совместимы с какими моделями устройств?',
-                    reason: 'Предотвращение установки несовместимых прошивок и корректные рекомендации пользователям.',
                     placeholder: 'Опишите матрицу совместимости...'
                 },
                 {
                     type: 'radio',
                     title: 'Поддерживается ли обратная совместимость (старые устройства + новые прошивки)?',
-                    reason: 'Предотвращение установки несовместимых прошивок и корректные рекомендации пользователям.',
                     options: ['Да, полностью', 'Частично', 'Нет', 'Зависит от модели']
                 },
                 {
                     type: 'radio',
                     title: 'Поддерживается ли прямая совместимость (новые устройства + старые прошивки)?',
-                    reason: 'Предотвращение установки несовместимых прошивок и корректные рекомендации пользователям.',
                     options: ['Да, полностью', 'Частично', 'Нет', 'Не рекомендуется']
                 },
                 {
                     type: 'radio',
                     title: 'Возможен ли downgrade прошивки на более раннюю версию?',
-                    reason: 'Предотвращение установки несовместимых прошивок и корректные рекомендации пользователям.',
                     options: ['Да, всегда', 'Да, но с ограничениями', 'Нет', 'Не рекомендуется']
                 },
                 {
-                    type: 'textarea',
-                    title: 'Существуют ли ограничения или рекомендации по обновлению между версиями?',
-                    reason: 'Предотвращение установки несовместимых прошивок и корректные рекомендации пользователям.',
-                    placeholder: 'Опишите ограничения и рекомендации...'
-                },
-                
-                // Секция 5: Технические характеристики файлов прошивки
-                {
                     type: 'checkbox',
                     title: 'Какой формат файлов прошивки используется?',
-                    reason: 'Валидация файлов при загрузке, верификация целостности, планирование хранилища.',
                     options: ['.bin', '.hex', '.fw', '.dat', '.zip архив', 'Другой']
                 },
                 {
                     type: 'text',
                     title: 'Типичный размер файла прошивки (в МБ)?',
-                    reason: 'Валидация файлов при загрузке, верификация целостности, планирование хранилища.',
                     placeholder: 'Например: 512 МБ или 1-2 ГБ'
                 },
                 {
                     type: 'radio',
-                    title: 'Прошивка поставляется как одиночный файл или как архив (.zip)?',
-                    reason: 'Валидация файлов при загрузке, верификация целостности, планирование хранилища.',
+                    title: 'Прошивка поставляется как одиночный файл или как архив?',
                     options: ['Одиночный файл', 'ZIP архив', 'Другой архив', 'Зависит от версии']
                 },
                 {
                     type: 'checkbox',
-                    title: 'Используются ли цифровые подписи для верификации целостности?',
-                    reason: 'Валидация файлов при загрузке, верификация целостности, планирование хранилища.',
+                    title: 'Используются ли методы верификации целостности?',
                     options: [
                         'MD5 checksum',
                         'SHA-256 checksum',
@@ -630,147 +569,91 @@
                 {
                     type: 'radio',
                     title: 'Есть ли служебные метаданные в составе файла прошивки?',
-                    reason: 'Валидация файлов при загрузке, верификация целостности, планирование хранилища.',
                     options: ['Да', 'Нет', 'Не знаю']
-                },
-                
-                // Секция 6: Метаданные прошивок
-                {
-                    type: 'textarea',
-                    title: 'Какая официальная информация должна сопровождать каждую версию прошивки?',
-                    reason: 'Полнота информации для пользователей и корректное управление обновлениями.',
-                    placeholder: 'Опишите необходимые метаданные...'
                 },
                 {
                     type: 'radio',
                     title: 'Публикуются ли changelog (описание изменений) для каждой версии?',
-                    reason: 'Полнота информации для пользователей и корректное управление обновлениями.',
                     options: ['Да, всегда', 'Иногда', 'Нет', 'Планируется']
                 },
                 {
                     type: 'radio',
-                    title: 'Указывается ли официальная дата релиза?',
-                    reason: 'Полнота информации для пользователей и корректное управление обновлениями.',
+                    title: 'Указывается ли официальная дата релиза для каждой версии?',
                     options: ['Да', 'Нет']
                 },
                 {
                     type: 'radio',
                     title: 'Существуют ли критические обновления, требующие обязательной установки?',
-                    reason: 'Полнота информации для пользователей и корректное управление обновлениями.',
                     options: ['Да', 'Нет', 'Редко', 'Планируется']
                 },
                 {
-                    type: 'radio',
-                    title: 'Публикуется ли информация о совместимости с конкретными аппаратными ревизиями?',
-                    reason: 'Полнота информации для пользователей и корректное управление обновлениями.',
-                    options: ['Да, всегда', 'Иногда', 'Нет']
-                },
-                
-                // Секция 7: Процесс обновления прошивок
-                {
                     type: 'checkbox',
                     title: 'Каким способом выполняется обновление прошивки?',
-                    reason: 'Создание понятных инструкций для пользователей системы.',
                     options: [
-                        'Через USB-накопитель',
+                        'USB-накопитель',
                         'Ethernet/LAN',
                         'Wi-Fi',
-                        'Веб-интерфейс',
-                        'Другие методы'
+                        'Через веб-интерфейс',
+                        'Только сервисным инженером',
+                        'Другое'
                     ]
                 },
                 {
-                    type: 'textarea',
-                    title: 'Какова детальная процедура обновления прошивки с точки зрения конечного пользователя?',
-                    reason: 'Создание понятных инструкций для пользователей системы.',
-                    placeholder: 'Опишите шаг за шагом...'
-                },
-                {
                     type: 'checkbox',
-                    title: 'Какие требования предъявляются к USB-накопителю (формат файловой системы, минимальный объём)?',
-                    reason: 'Создание понятных инструкций для пользователей системы.',
+                    title: 'Какие требования к USB-накопителю (если используется)?',
                     options: [
-                        'FAT32',
-                        'NTFS',
+                        'FAT32 формат',
+                        'NTFS формат',
                         'Минимум 512 МБ',
                         'Минимум 2 ГБ',
+                        'Специальная структура папок',
                         'Нет особых требований'
                     ]
                 },
                 {
-                    type: 'radio',
-                    title: 'Нужна ли специальная структура каталогов на USB-накопителе?',
-                    reason: 'Создание понятных инструкций для пользователей системы.',
-                    options: ['Да', 'Нет', 'Рекомендуется']
-                },
-                {
-                    type: 'text',
-                    title: 'Как устройство идентифицирует файл прошивки на накопителе?',
-                    reason: 'Создание понятных инструкций для пользователей системы.',
-                    placeholder: 'Опишите механизм идентификации'
-                },
-                {
-                    type: 'radio',
-                    title: 'Есть ли встроенная валидация прошивки перед установкой?',
-                    reason: 'Создание понятных инструкций для пользователей системы.',
-                    options: ['Да, автоматическая', 'Да, ручная', 'Нет']
+                    type: 'textarea',
+                    title: 'Опишите пошаговую процедуру обновления прошивки',
+                    placeholder: 'Шаг 1: ...\nШаг 2: ...'
                 },
                 {
                     type: 'text',
                     title: 'Какова типичная длительность процесса обновления?',
-                    reason: 'Создание понятных инструкций для пользователей системы.',
                     placeholder: 'Например: 5-10 минут'
                 },
                 {
-                    type: 'textarea',
-                    title: 'Возможны ли ошибки при обновлении и как их диагностировать?',
-                    reason: 'Создание понятных инструкций для пользователей системы.',
-                    placeholder: 'Опишите типичные ошибки и способы диагностики...'
+                    type: 'radio',
+                    title: 'Есть ли встроенная валидация прошивки перед установкой?',
+                    options: ['Да, автоматическая', 'Да, ручная', 'Нет']
                 },
-                
-                // Секция 8: Частота и политика обновлений
+                {
+                    type: 'textarea',
+                    title: 'Какие ошибки могут возникнуть при обновлении и как их диагностировать?',
+                    placeholder: 'Опишите типичные проблемы и их решения...'
+                },
                 {
                     type: 'radio',
                     title: 'Как часто выходят новые версии прошивок?',
-                    reason: 'Планирование обслуживания системы и информирование пользователей.',
                     options: [
                         'Ежемесячно',
                         'Ежеквартально',
                         'Раз в полгода',
                         'По мере необходимости',
-                        'Нет регулярного графика'
-                    ]
-                },
-                {
-                    type: 'checkbox',
-                    title: 'По какому принципу принимается решение о выпуске новой версии?',
-                    reason: 'Планирование обслуживания системы и информирование пользователей.',
-                    options: [
-                        'Bug fixes',
-                        'Новые функции',
-                        'Критические исправления',
-                        'Плановые обновления',
-                        'По запросам клиентов'
+                        'Нет графика'
                     ]
                 },
                 {
                     type: 'text',
                     title: 'Как долго поддерживаются предыдущие версии прошивок?',
-                    reason: 'Планирование обслуживания системы и информирование пользователей.',
                     placeholder: 'Например: 1 год, 2 года'
                 },
                 {
                     type: 'radio',
                     title: 'Существует ли политика End-of-Life для старых версий?',
-                    reason: 'Планирование обслуживания системы и информирование пользователей.',
                     options: ['Да', 'Нет', 'В разработке']
                 },
-                
-                // Секция 9: Доступ к прошивкам
                 {
                     type: 'checkbox',
-                    title: 'Как в настоящее время распространяются прошивки среди клиентов?',
-                    reason: 'Интеграция с существующими процессами распространения обновлений.',
+                    title: 'Как в настоящее время распространяются прошивки?',
                     options: [
                         'Официальный сайт',
                         'Email рассылка',
@@ -782,208 +665,143 @@
                 },
                 {
                     type: 'radio',
-                    title: 'Существует ли официальный портал или репозиторий для загрузки прошивок?',
-                    reason: 'Интеграция с существующими процессами распространения обновлений.',
-                    options: ['Да, публичный', 'Да, требуется авторизация', 'Нет', 'В разработке']
+                    title: 'Существует ли официальный портал для загрузки прошивок?',
+                    options: ['Да, публичный', 'Да, по авторизации', 'Нет', 'В разработке']
                 },
                 {
                     type: 'radio',
-                    title: 'Требуется ли авторизация для доступа к файлам прошивок?',
-                    reason: 'Интеграция с существующими процессами распространения обновлений.',
-                    options: ['Да', 'Нет', 'Зависит от версии']
+                    title: 'Доступна ли история всех версий прошивок?',
+                    options: ['Да, все версии', 'Только последние 5', 'Только текущая', 'Нет']
                 },
-                {
-                    type: 'text',
-                    title: 'Как осуществляется техническая поддержка при возникновении проблем с обновлением?',
-                    reason: 'Интеграция с существующими процессами распространения обновлений.',
-                    placeholder: 'Опишите каналы поддержки'
-                },
-                {
-                    type: 'radio',
-                    title: 'Доступна ли история всех версий прошивок или только последняя актуальная?',
-                    reason: 'Интеграция с существующими процессами распространения обновлений.',
-                    options: ['Все версии', 'Только последние 5', 'Только текущая', 'Нет архива']
-                },
-                
-                // Секция 10: Документация и обучение
                 {
                     type: 'checkbox',
-                    title: 'Предоставляется ли техническая документация по обновлению прошивок?',
-                    reason: 'Встроенная справочная система для пользователей.',
+                    title: 'Какая документация доступна?',
                     options: [
-                        'Да, PDF-руководства',
-                        'Да, онлайн документация',
-                        'Да, видео-инструкции',
-                        'Нет',
-                        'В разработке'
+                        'Техническая документация',
+                        'Видео-инструкции',
+                        'PDF руководства',
+                        'Troubleshooting guide',
+                        'FAQ',
+                        'Ничего'
                     ]
                 },
                 {
                     type: 'radio',
-                    title: 'Есть ли видео-инструкции или обучающие материалы?',
-                    reason: 'Встроенная справочная система для пользователей.',
-                    options: ['Да', 'Нет', 'Планируется']
-                },
-                {
-                    type: 'radio',
-                    title: 'Доступны ли эти материалы в цифровом виде для интеграции в систему?',
-                    reason: 'Встроенная справочная система для пользователей.',
+                    title: 'Доступны ли обучающие материалы в цифровом виде?',
                     options: ['Да, все', 'Частично', 'Нет', 'По запросу']
                 },
                 {
-                    type: 'radio',
-                    title: 'Существуют ли типовые проблемы и их решения (troubleshooting guide)?',
-                    reason: 'Встроенная справочная система для пользователей.',
-                    options: ['Да', 'Нет', 'В разработке']
+                    type: 'textarea',
+                    title: 'Какие дополнительные материалы вы можете предоставить?',
+                    placeholder: 'Перечислите доступные документы, файлы, контакты...'
                 }
             ],
             en: [
-                // Section 1: Device Versioning
                 {
                     type: 'radio',
                     title: 'Are there different hardware revisions of MCT Unit?',
-                    reason: 'Correct device identification and firmware compatibility determination.',
                     options: ['Yes', 'No', 'Don\'t know']
                 },
                 {
                     type: 'text',
-                    title: 'Are model numbers or hardware versions used (e.g., v1.0, v2.0, Rev.A, Rev.B)?',
-                    reason: 'Correct device identification and firmware compatibility determination.',
+                    title: 'If yes, list which ones (e.g., Rev.A, Rev.B, v1.0, v2.0)',
                     placeholder: 'Enter versions separated by commas'
                 },
                 {
                     type: 'checkbox',
-                    title: 'How to determine the hardware version of a specific device?',
-                    reason: 'Correct device identification and firmware compatibility determination.',
+                    title: 'How can the hardware version of the device be identified?',
                     options: [
-                        'Serial number',
-                        'Case marking',
-                        'Screen display',
-                        'Settings menu',
-                        'Documentation',
+                        'By serial number',
+                        'By marking on the case',
+                        'On device screen',
+                        'In settings menu',
+                        'From documentation',
                         'Other'
                     ]
                 },
                 {
                     type: 'radio',
                     title: 'Does hardware version affect firmware compatibility?',
-                    reason: 'Correct device identification and firmware compatibility determination.',
                     options: ['Yes, significantly', 'Partially', 'No', 'Don\'t know']
                 },
-                
-                // Section 2: Firmware Numbering Scheme
                 {
                     type: 'text',
                     title: 'What official format is used for firmware versions?',
-                    reason: 'Correct interpretation of versions, their sorting and display in the system.',
                     placeholder: 'E.g., V[MM][YY], major.minor.patch'
                 },
                 {
                     type: 'radio',
-                    title: 'Does version V0923 suggest V[MM][YY] format (month-year)? Is this correct?',
-                    reason: 'Correct interpretation of versions, their sorting and display in the system.',
+                    title: 'Version V0923 suggests V[MM][YY] format (month-year). Is this correct?',
                     options: ['Yes, correct', 'No, different format', 'Partially correct']
                 },
                 {
                     type: 'textarea',
                     title: 'What firmware versions currently exist?',
-                    reason: 'Correct interpretation of versions, their sorting and display in the system.',
                     placeholder: 'List all known versions...'
                 },
                 {
                     type: 'radio',
                     title: 'Are patch versions used within a period (e.g., V0923.1, V0923.2)?',
-                    reason: 'Correct interpretation of versions, their sorting and display in the system.',
                     options: ['Yes', 'No', 'Planned']
                 },
                 {
                     type: 'radio',
                     title: 'Is semantic versioning (major.minor.patch) applied?',
-                    reason: 'Correct interpretation of versions, their sorting and display in the system.',
                     options: ['Yes', 'No', 'Partially']
                 },
-                
-                // Section 3: Device Models
                 {
                     type: 'textarea',
-                    title: 'What MCT Unit device models currently exist?',
-                    reason: 'Building a model directory and determining compatibility.',
-                    placeholder: 'List all models with official names...'
-                },
-                {
-                    type: 'text',
-                    title: 'What are the correct names of these models?',
-                    reason: 'Building a model directory and determining compatibility.',
-                    placeholder: 'Official model names'
+                    title: 'What MCT Unit device models exist?',
+                    placeholder: 'List all models with their official names...'
                 },
                 {
                     type: 'radio',
                     title: 'Are new models planned for release soon?',
-                    reason: 'Building a model directory and determining compatibility.',
                     options: ['Yes, this year', 'Yes, next year', 'No', 'Don\'t know']
                 },
                 {
                     type: 'textarea',
-                    title: 'What are the key differences between models (if any)?',
-                    reason: 'Building a model directory and determining compatibility.',
+                    title: 'What are the key differences between models?',
                     placeholder: 'Describe technical and functional differences...'
                 },
-                
-                // Section 4: Compatibility Matrix
                 {
                     type: 'textarea',
                     title: 'Which firmwares are compatible with which device models?',
-                    reason: 'Preventing incompatible firmware installation and correct user recommendations.',
                     placeholder: 'Describe compatibility matrix...'
                 },
                 {
                     type: 'radio',
                     title: 'Is backward compatibility supported (old devices + new firmware)?',
-                    reason: 'Preventing incompatible firmware installation and correct user recommendations.',
                     options: ['Yes, fully', 'Partially', 'No', 'Depends on model']
                 },
                 {
                     type: 'radio',
                     title: 'Is forward compatibility supported (new devices + old firmware)?',
-                    reason: 'Preventing incompatible firmware installation and correct user recommendations.',
                     options: ['Yes, fully', 'Partially', 'No', 'Not recommended']
                 },
                 {
                     type: 'radio',
                     title: 'Is firmware downgrade to earlier version possible?',
-                    reason: 'Preventing incompatible firmware installation and correct user recommendations.',
                     options: ['Yes, always', 'Yes, with limitations', 'No', 'Not recommended']
                 },
                 {
-                    type: 'textarea',
-                    title: 'Are there limitations or recommendations for updating between versions?',
-                    reason: 'Preventing incompatible firmware installation and correct user recommendations.',
-                    placeholder: 'Describe limitations and recommendations...'
-                },
-                
-                // Section 5: Firmware File Technical Specifications
-                {
                     type: 'checkbox',
                     title: 'What firmware file format is used?',
-                    reason: 'File validation on upload, integrity verification, storage planning.',
                     options: ['.bin', '.hex', '.fw', '.dat', '.zip archive', 'Other']
                 },
                 {
                     type: 'text',
                     title: 'Typical firmware file size (in MB)?',
-                    reason: 'File validation on upload, integrity verification, storage planning.',
                     placeholder: 'E.g., 512 MB or 1-2 GB'
                 },
                 {
                     type: 'radio',
-                    title: 'Is firmware supplied as single file or archive (.zip)?',
-                    reason: 'File validation on upload, integrity verification, storage planning.',
+                    title: 'Is firmware supplied as single file or archive?',
                     options: ['Single file', 'ZIP archive', 'Other archive', 'Depends on version']
                 },
                 {
                     type: 'checkbox',
-                    title: 'Are digital signatures used for integrity verification?',
-                    reason: 'File validation on upload, integrity verification, storage planning.',
+                    title: 'Are integrity verification methods used?',
                     options: [
                         'MD5 checksum',
                         'SHA-256 checksum',
@@ -994,148 +812,92 @@
                 },
                 {
                     type: 'radio',
-                    title: 'Are there service metadata in the firmware file?',
-                    reason: 'File validation on upload, integrity verification, storage planning.',
+                    title: 'Are there service metadata in firmware file?',
                     options: ['Yes', 'No', 'Don\'t know']
-                },
-                
-                // Section 6: Firmware Metadata
-                {
-                    type: 'textarea',
-                    title: 'What official information should accompany each firmware version?',
-                    reason: 'Complete information for users and correct update management.',
-                    placeholder: 'Describe required metadata...'
                 },
                 {
                     type: 'radio',
-                    title: 'Is changelog (description of changes) published for each version?',
-                    reason: 'Complete information for users and correct update management.',
+                    title: 'Is changelog published for each version?',
                     options: ['Yes, always', 'Sometimes', 'No', 'Planned']
                 },
                 {
                     type: 'radio',
-                    title: 'Is official release date specified?',
-                    reason: 'Complete information for users and correct update management.',
+                    title: 'Is official release date specified for each version?',
                     options: ['Yes', 'No']
                 },
                 {
                     type: 'radio',
                     title: 'Are there critical updates requiring mandatory installation?',
-                    reason: 'Complete information for users and correct update management.',
                     options: ['Yes', 'No', 'Rarely', 'Planned']
                 },
                 {
-                    type: 'radio',
-                    title: 'Is compatibility information with specific hardware revisions published?',
-                    reason: 'Complete information for users and correct update management.',
-                    options: ['Yes, always', 'Sometimes', 'No']
-                },
-                
-                // Section 7: Firmware Update Process
-                {
                     type: 'checkbox',
                     title: 'How is firmware update performed?',
-                    reason: 'Creating clear instructions for system users.',
                     options: [
-                        'Via USB drive',
+                        'USB drive',
                         'Ethernet/LAN',
                         'Wi-Fi',
-                        'Web interface',
-                        'Other methods'
+                        'Via web interface',
+                        'Service engineer only',
+                        'Other'
                     ]
                 },
                 {
-                    type: 'textarea',
-                    title: 'What is the detailed firmware update procedure from end user perspective?',
-                    reason: 'Creating clear instructions for system users.',
-                    placeholder: 'Describe step by step...'
-                },
-                {
                     type: 'checkbox',
-                    title: 'What are USB drive requirements (file system format, minimum size)?',
-                    reason: 'Creating clear instructions for system users.',
+                    title: 'What are USB drive requirements (if used)?',
                     options: [
-                        'FAT32',
-                        'NTFS',
+                        'FAT32 format',
+                        'NTFS format',
                         'Minimum 512 MB',
                         'Minimum 2 GB',
+                        'Special folder structure',
                         'No special requirements'
                     ]
                 },
                 {
-                    type: 'radio',
-                    title: 'Is special directory structure needed on USB drive?',
-                    reason: 'Creating clear instructions for system users.',
-                    options: ['Yes', 'No', 'Recommended']
-                },
-                {
-                    type: 'text',
-                    title: 'How does device identify firmware file on the drive?',
-                    reason: 'Creating clear instructions for system users.',
-                    placeholder: 'Describe identification mechanism'
-                },
-                {
-                    type: 'radio',
-                    title: 'Is there built-in firmware validation before installation?',
-                    reason: 'Creating clear instructions for system users.',
-                    options: ['Yes, automatic', 'Yes, manual', 'No']
+                    type: 'textarea',
+                    title: 'Describe step-by-step firmware update procedure',
+                    placeholder: 'Step 1: ...\nStep 2: ...'
                 },
                 {
                     type: 'text',
                     title: 'What is typical update process duration?',
-                    reason: 'Creating clear instructions for system users.',
                     placeholder: 'E.g., 5-10 minutes'
                 },
                 {
-                    type: 'textarea',
-                    title: 'Are errors possible during update and how to diagnose them?',
-                    reason: 'Creating clear instructions for system users.',
-                    placeholder: 'Describe typical errors and diagnosis methods...'
+                    type: 'radio',
+                    title: 'Is there built-in firmware validation before installation?',
+                    options: ['Yes, automatic', 'Yes, manual', 'No']
                 },
-                
-                // Section 8: Update Frequency and Policy
+                {
+                    type: 'textarea',
+                    title: 'What errors can occur during update and how to diagnose them?',
+                    placeholder: 'Describe typical issues and solutions...'
+                },
                 {
                     type: 'radio',
                     title: 'How often are new firmware versions released?',
-                    reason: 'System maintenance planning and user notification.',
                     options: [
                         'Monthly',
                         'Quarterly',
                         'Semi-annually',
                         'As needed',
-                        'No regular schedule'
-                    ]
-                },
-                {
-                    type: 'checkbox',
-                    title: 'What principle determines new version release?',
-                    reason: 'System maintenance planning and user notification.',
-                    options: [
-                        'Bug fixes',
-                        'New features',
-                        'Critical fixes',
-                        'Scheduled updates',
-                        'Customer requests'
+                        'No schedule'
                     ]
                 },
                 {
                     type: 'text',
                     title: 'How long are previous firmware versions supported?',
-                    reason: 'System maintenance planning and user notification.',
                     placeholder: 'E.g., 1 year, 2 years'
                 },
                 {
                     type: 'radio',
                     title: 'Is there End-of-Life policy for old versions?',
-                    reason: 'System maintenance planning and user notification.',
                     options: ['Yes', 'No', 'In development']
                 },
-                
-                // Section 9: Firmware Access
                 {
                     type: 'checkbox',
-                    title: 'How are firmwares currently distributed to clients?',
-                    reason: 'Integration with existing update distribution processes.',
+                    title: 'How are firmwares currently distributed?',
                     options: [
                         'Official website',
                         'Email distribution',
@@ -1147,363 +909,242 @@
                 },
                 {
                     type: 'radio',
-                    title: 'Is there official portal or repository for firmware downloads?',
-                    reason: 'Integration with existing update distribution processes.',
-                    options: ['Yes, public', 'Yes, requires authorization', 'No', 'In development']
+                    title: 'Is there official portal for firmware downloads?',
+                    options: ['Yes, public', 'Yes, with authorization', 'No', 'In development']
                 },
                 {
                     type: 'radio',
-                    title: 'Is authorization required for firmware file access?',
-                    reason: 'Integration with existing update distribution processes.',
-                    options: ['Yes', 'No', 'Depends on version']
+                    title: 'Is history of all firmware versions available?',
+                    options: ['Yes, all versions', 'Only last 5', 'Only current', 'No']
                 },
-                {
-                    type: 'text',
-                    title: 'How is technical support provided for update problems?',
-                    reason: 'Integration with existing update distribution processes.',
-                    placeholder: 'Describe support channels'
-                },
-                {
-                    type: 'radio',
-                    title: 'Is history of all firmware versions available or only latest?',
-                    reason: 'Integration with existing update distribution processes.',
-                    options: ['All versions', 'Only last 5', 'Only current', 'No archive']
-                },
-                
-                // Section 10: Documentation and Training
                 {
                     type: 'checkbox',
-                    title: 'Is technical documentation on firmware updates provided?',
-                    reason: 'Built-in help system for users.',
+                    title: 'What documentation is available?',
                     options: [
-                        'Yes, PDF manuals',
-                        'Yes, online documentation',
-                        'Yes, video tutorials',
-                        'No',
-                        'In development'
+                        'Technical documentation',
+                        'Video tutorials',
+                        'PDF manuals',
+                        'Troubleshooting guide',
+                        'FAQ',
+                        'Nothing'
                     ]
                 },
                 {
                     type: 'radio',
-                    title: 'Are video tutorials or training materials available?',
-                    reason: 'Built-in help system for users.',
-                    options: ['Yes', 'No', 'Planned']
-                },
-                {
-                    type: 'radio',
-                    title: 'Are these materials available digitally for system integration?',
-                    reason: 'Built-in help system for users.',
+                    title: 'Are training materials available in digital format?',
                     options: ['Yes, all', 'Partially', 'No', 'On request']
                 },
                 {
-                    type: 'radio',
-                    title: 'Are there typical problems and solutions (troubleshooting guide)?',
-                    reason: 'Built-in help system for users.',
-                    options: ['Yes', 'No', 'In development']
+                    type: 'textarea',
+                    title: 'What additional materials can you provide?',
+                    placeholder: 'List available documents, files, contacts...'
                 }
             ],
             es: [
-                // Sección 1: Versionado de Dispositivos
                 {
                     type: 'radio',
                     title: '¿Existen diferentes revisiones de hardware de MCT Unit?',
-                    reason: 'Identificación correcta de dispositivos y determinación de compatibilidad de firmware.',
                     options: ['Sí', 'No', 'No sé']
                 },
                 {
                     type: 'text',
-                    title: '¿Se utilizan números de modelo o versiones de hardware (ej., v1.0, v2.0, Rev.A, Rev.B)?',
-                    reason: 'Identificación correcta de dispositivos y determinación de compatibilidad de firmware.',
+                    title: 'Si es así, enumere cuáles (ej., Rev.A, Rev.B, v1.0, v2.0)',
                     placeholder: 'Ingrese versiones separadas por comas'
                 },
                 {
                     type: 'checkbox',
-                    title: '¿Cómo determinar la versión de hardware de un dispositivo específico?',
-                    reason: 'Identificación correcta de dispositivos y determinación de compatibilidad de firmware.',
+                    title: '¿Cómo se puede identificar la versión de hardware del dispositivo?',
                     options: [
-                        'Número de serie',
-                        'Marcado en carcasa',
-                        'Pantalla del dispositivo',
-                        'Menú de configuración',
-                        'Documentación',
+                        'Por número de serie',
+                        'Por marcado en la carcasa',
+                        'En pantalla del dispositivo',
+                        'En menú de configuración',
+                        'Por documentación',
                         'Otro'
                     ]
                 },
                 {
                     type: 'radio',
                     title: '¿La versión de hardware afecta la compatibilidad con firmware?',
-                    reason: 'Identificación correcta de dispositivos y determinación de compatibilidad de firmware.',
                     options: ['Sí, significativamente', 'Parcialmente', 'No', 'No sé']
                 },
-                
-                // Sección 2: Esquema de Numeración de Firmware
                 {
                     type: 'text',
                     title: '¿Qué formato oficial se usa para versiones de firmware?',
-                    reason: 'Interpretación correcta de versiones, su ordenamiento y visualización en el sistema.',
                     placeholder: 'Ej., V[MM][AA], major.minor.patch'
                 },
                 {
                     type: 'radio',
-                    title: '¿La versión V0923 sugiere formato V[MM][AA] (mes-año)? ¿Es correcto?',
-                    reason: 'Interpretación correcta de versiones, su ordenamiento y visualización en el sistema.',
+                    title: 'La versión V0923 sugiere formato V[MM][AA] (mes-año). ¿Es correcto?',
                     options: ['Sí, correcto', 'No, formato diferente', 'Parcialmente correcto']
                 },
                 {
                     type: 'textarea',
                     title: '¿Qué versiones de firmware existen actualmente?',
-                    reason: 'Interpretación correcta de versiones, su ordenamiento y visualización en el sistema.',
                     placeholder: 'Liste todas las versiones conocidas...'
                 },
                 {
                     type: 'radio',
                     title: '¿Se usan versiones de parche dentro de un período (ej., V0923.1, V0923.2)?',
-                    reason: 'Interpretación correcta de versiones, su ordenamiento y visualización en el sistema.',
                     options: ['Sí', 'No', 'Planificado']
                 },
                 {
                     type: 'radio',
                     title: '¿Se aplica versionado semántico (major.minor.patch)?',
-                    reason: 'Interpretación correcta de versiones, su ordenamiento y visualización en el sistema.',
                     options: ['Sí', 'No', 'Parcialmente']
                 },
-                
-                // Sección 3: Modelos de Dispositivos
                 {
                     type: 'textarea',
-                    title: '¿Qué modelos de dispositivos MCT Unit existen actualmente?',
-                    reason: 'Construcción de directorio de modelos y determinación de compatibilidad.',
-                    placeholder: 'Liste todos los modelos con nombres oficiales...'
-                },
-                {
-                    type: 'text',
-                    title: '¿Cuáles son los nombres correctos de estos modelos?',
-                    reason: 'Construcción de directorio de modelos y determinación de compatibilidad.',
-                    placeholder: 'Nombres oficiales de modelos'
+                    title: '¿Qué modelos de dispositivos MCT Unit existen?',
+                    placeholder: 'Liste todos los modelos con sus nombres oficiales...'
                 },
                 {
                     type: 'radio',
                     title: '¿Se planea el lanzamiento de nuevos modelos próximamente?',
-                    reason: 'Construcción de directorio de modelos y determinación de compatibilidad.',
                     options: ['Sí, este año', 'Sí, próximo año', 'No', 'No sé']
                 },
                 {
                     type: 'textarea',
-                    title: '¿Cuáles son las diferencias clave entre modelos (si hay)?',
-                    reason: 'Construcción de directorio de modelos y determinación de compatibilidad.',
+                    title: '¿Cuáles son las diferencias clave entre modelos?',
                     placeholder: 'Describa diferencias técnicas y funcionales...'
                 },
-                
-                // Sección 4: Matriz de Compatibilidad
                 {
                     type: 'textarea',
-                    title: '¿Qué firmwares son compatibles con qué modelos de dispositivos?',
-                    reason: 'Prevención de instalación de firmware incompatible y recomendaciones correctas al usuario.',
+                    title: '¿Qué firmwares son compatibles con qué modelos?',
                     placeholder: 'Describa matriz de compatibilidad...'
                 },
                 {
                     type: 'radio',
                     title: '¿Se admite compatibilidad hacia atrás (dispositivos antiguos + firmware nuevo)?',
-                    reason: 'Prevención de instalación de firmware incompatible y recomendaciones correctas al usuario.',
                     options: ['Sí, completamente', 'Parcialmente', 'No', 'Depende del modelo']
                 },
                 {
                     type: 'radio',
                     title: '¿Se admite compatibilidad hacia adelante (dispositivos nuevos + firmware antiguo)?',
-                    reason: 'Prevención de instalación de firmware incompatible y recomendaciones correctas al usuario.',
                     options: ['Sí, completamente', 'Parcialmente', 'No', 'No recomendado']
                 },
                 {
                     type: 'radio',
                     title: '¿Es posible degradar firmware a versión anterior?',
-                    reason: 'Prevención de instalación de firmware incompatible y recomendaciones correctas al usuario.',
                     options: ['Sí, siempre', 'Sí, con limitaciones', 'No', 'No recomendado']
                 },
                 {
-                    type: 'textarea',
-                    title: '¿Existen limitaciones o recomendaciones para actualización entre versiones?',
-                    reason: 'Prevención de instalación de firmware incompatible y recomendaciones correctas al usuario.',
-                    placeholder: 'Describa limitaciones y recomendaciones...'
-                },
-                
-                // Sección 5: Especificaciones Técnicas de Archivos de Firmware
-                {
                     type: 'checkbox',
                     title: '¿Qué formato de archivo de firmware se usa?',
-                    reason: 'Validación de archivos en carga, verificación de integridad, planificación de almacenamiento.',
                     options: ['.bin', '.hex', '.fw', '.dat', 'archivo .zip', 'Otro']
                 },
                 {
                     type: 'text',
                     title: '¿Tamaño típico de archivo de firmware (en MB)?',
-                    reason: 'Validación de archivos en carga, verificación de integridad, planificación de almacenamiento.',
                     placeholder: 'Ej., 512 MB o 1-2 GB'
                 },
                 {
                     type: 'radio',
-                    title: '¿El firmware se suministra como archivo único o archivo (.zip)?',
-                    reason: 'Validación de archivos en carga, verificación de integridad, planificación de almacenamiento.',
+                    title: '¿El firmware se suministra como archivo único o comprimido?',
                     options: ['Archivo único', 'Archivo ZIP', 'Otro archivo', 'Depende de versión']
                 },
                 {
                     type: 'checkbox',
-                    title: '¿Se usan firmas digitales para verificación de integridad?',
-                    reason: 'Validación de archivos en carga, verificación de integridad, planificación de almacenamiento.',
+                    title: '¿Se usan métodos de verificación de integridad?',
                     options: [
                         'Suma MD5',
                         'Suma SHA-256',
                         'Firma digital',
                         'Otro método',
-                        'No se usa'
+                        'No se usan'
                     ]
                 },
                 {
                     type: 'radio',
                     title: '¿Hay metadatos de servicio en el archivo de firmware?',
-                    reason: 'Validación de archivos en carga, verificación de integridad, planificación de almacenamiento.',
                     options: ['Sí', 'No', 'No sé']
-                },
-                
-                // Sección 6: Metadatos de Firmware
-                {
-                    type: 'textarea',
-                    title: '¿Qué información oficial debe acompañar cada versión de firmware?',
-                    reason: 'Información completa para usuarios y gestión correcta de actualizaciones.',
-                    placeholder: 'Describa metadatos requeridos...'
                 },
                 {
                     type: 'radio',
-                    title: '¿Se publica registro de cambios (changelog) para cada versión?',
-                    reason: 'Información completa para usuarios y gestión correcta de actualizaciones.',
+                    title: '¿Se publica registro de cambios para cada versión?',
                     options: ['Sí, siempre', 'A veces', 'No', 'Planificado']
                 },
                 {
                     type: 'radio',
-                    title: '¿Se especifica fecha oficial de lanzamiento?',
-                    reason: 'Información completa para usuarios y gestión correcta de actualizaciones.',
+                    title: '¿Se especifica fecha oficial de lanzamiento para cada versión?',
                     options: ['Sí', 'No']
                 },
                 {
                     type: 'radio',
                     title: '¿Hay actualizaciones críticas que requieren instalación obligatoria?',
-                    reason: 'Información completa para usuarios y gestión correcta de actualizaciones.',
                     options: ['Sí', 'No', 'Raramente', 'Planificado']
                 },
                 {
-                    type: 'radio',
-                    title: '¿Se publica información de compatibilidad con revisiones de hardware específicas?',
-                    reason: 'Información completa para usuarios y gestión correcta de actualizaciones.',
-                    options: ['Sí, siempre', 'A veces', 'No']
-                },
-                
-                // Sección 7: Proceso de Actualización de Firmware
-                {
                     type: 'checkbox',
-                    title: '¿Cómo se realiza la actualización de firmware?',
-                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
+                    title: '¿Cómo se realiza actualización de firmware?',
                     options: [
-                        'Vía unidad USB',
+                        'Unidad USB',
                         'Ethernet/LAN',
                         'Wi-Fi',
-                        'Interfaz web',
-                        'Otros métodos'
+                        'Vía interfaz web',
+                        'Solo ingeniero de servicio',
+                        'Otro'
                     ]
                 },
                 {
-                    type: 'textarea',
-                    title: '¿Cuál es el procedimiento detallado de actualización desde perspectiva del usuario final?',
-                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
-                    placeholder: 'Describa paso a paso...'
-                },
-                {
                     type: 'checkbox',
-                    title: '¿Qué requisitos tiene la unidad USB (formato de sistema de archivos, tamaño mínimo)?',
-                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
+                    title: '¿Qué requisitos tiene la unidad USB (si se usa)?',
                     options: [
-                        'FAT32',
-                        'NTFS',
+                        'Formato FAT32',
+                        'Formato NTFS',
                         'Mínimo 512 MB',
                         'Mínimo 2 GB',
+                        'Estructura de carpetas especial',
                         'Sin requisitos especiales'
                     ]
                 },
                 {
-                    type: 'radio',
-                    title: '¿Se necesita estructura especial de directorios en unidad USB?',
-                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
-                    options: ['Sí', 'No', 'Recomendado']
+                    type: 'textarea',
+                    title: 'Describa procedimiento paso a paso de actualización',
+                    placeholder: 'Paso 1: ...\nPaso 2: ...'
                 },
                 {
                     type: 'text',
-                    title: '¿Cómo identifica el dispositivo el archivo de firmware en la unidad?',
-                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
-                    placeholder: 'Describa mecanismo de identificación'
-                },
-                {
-                    type: 'radio',
-                    title: '¿Hay validación integrada de firmware antes de instalación?',
-                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
-                    options: ['Sí, automática', 'Sí, manual', 'No']
-                },
-                {
-                    type: 'text',
-                    title: '¿Cuál es la duración típica del proceso de actualización?',
-                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
+                    title: '¿Cuál es la duración típica del proceso?',
                     placeholder: 'Ej., 5-10 minutos'
                 },
                 {
-                    type: 'textarea',
-                    title: '¿Son posibles errores durante actualización y cómo diagnosticarlos?',
-                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
-                    placeholder: 'Describa errores típicos y métodos de diagnóstico...'
+                    type: 'radio',
+                    title: '¿Hay validación integrada antes de instalación?',
+                    options: ['Sí, automática', 'Sí, manual', 'No']
                 },
-                
-                // Sección 8: Frecuencia y Política de Actualizaciones
+                {
+                    type: 'textarea',
+                    title: '¿Qué errores pueden ocurrir y cómo diagnosticarlos?',
+                    placeholder: 'Describa problemas típicos y soluciones...'
+                },
                 {
                     type: 'radio',
-                    title: '¿Con qué frecuencia se lanzan nuevas versiones de firmware?',
-                    reason: 'Planificación de mantenimiento del sistema y notificación de usuarios.',
+                    title: '¿Con qué frecuencia se lanzan nuevas versiones?',
                     options: [
                         'Mensualmente',
                         'Trimestralmente',
                         'Semestralmente',
                         'Según necesidad',
-                        'Sin calendario regular'
-                    ]
-                },
-                {
-                    type: 'checkbox',
-                    title: '¿Qué principio determina el lanzamiento de nueva versión?',
-                    reason: 'Planificación de mantenimiento del sistema y notificación de usuarios.',
-                    options: [
-                        'Corrección de errores',
-                        'Nuevas funciones',
-                        'Correcciones críticas',
-                        'Actualizaciones programadas',
-                        'Solicitudes de clientes'
+                        'Sin calendario'
                     ]
                 },
                 {
                     type: 'text',
-                    title: '¿Cuánto tiempo se admiten versiones anteriores de firmware?',
-                    reason: 'Planificación de mantenimiento del sistema y notificación de usuarios.',
+                    title: '¿Cuánto tiempo se admiten versiones anteriores?',
                     placeholder: 'Ej., 1 año, 2 años'
                 },
                 {
                     type: 'radio',
-                    title: '¿Existe política de fin de vida útil para versiones antiguas?',
-                    reason: 'Planificación de mantenimiento del sistema y notificación de usuarios.',
+                    title: '¿Hay política de fin de vida útil para versiones antiguas?',
                     options: ['Sí', 'No', 'En desarrollo']
                 },
-                
-                // Sección 9: Acceso a Firmware
                 {
                     type: 'checkbox',
-                    title: '¿Cómo se distribuyen actualmente los firmwares a los clientes?',
-                    reason: 'Integración con procesos existentes de distribución de actualizaciones.',
+                    title: '¿Cómo se distribuyen los firmwares actualmente?',
                     options: [
                         'Sitio web oficial',
-                        'Distribución por correo',
+                        'Distribución por email',
                         'A través de distribuidores',
                         'Por solicitud',
                         'Notificación automática',
@@ -1512,59 +1153,35 @@
                 },
                 {
                     type: 'radio',
-                    title: '¿Existe portal oficial o repositorio para descargas de firmware?',
-                    reason: 'Integración con procesos existentes de distribución de actualizaciones.',
-                    options: ['Sí, público', 'Sí, requiere autorización', 'No', 'En desarrollo']
+                    title: '¿Hay portal oficial para descargas?',
+                    options: ['Sí, público', 'Sí, con autorización', 'No', 'En desarrollo']
                 },
                 {
                     type: 'radio',
-                    title: '¿Se requiere autorización para acceso a archivos de firmware?',
-                    reason: 'Integración con procesos existentes de distribución de actualizaciones.',
-                    options: ['Sí', 'No', 'Depende de versión']
+                    title: '¿Está disponible el historial de todas las versiones?',
+                    options: ['Sí, todas', 'Solo últimas 5', 'Solo actual', 'No']
                 },
-                {
-                    type: 'text',
-                    title: '¿Cómo se proporciona soporte técnico para problemas de actualización?',
-                    reason: 'Integración con procesos existentes de distribución de actualizaciones.',
-                    placeholder: 'Describa canales de soporte'
-                },
-                {
-                    type: 'radio',
-                    title: '¿Está disponible el historial de todas las versiones o solo la última?',
-                    reason: 'Integración con procesos existentes de distribución de actualizaciones.',
-                    options: ['Todas las versiones', 'Solo últimas 5', 'Solo actual', 'Sin archivo']
-                },
-                
-                // Sección 10: Documentación y Capacitación
                 {
                     type: 'checkbox',
-                    title: '¿Se proporciona documentación técnica sobre actualizaciones de firmware?',
-                    reason: 'Sistema de ayuda integrado para usuarios.',
+                    title: '¿Qué documentación está disponible?',
                     options: [
-                        'Sí, manuales PDF',
-                        'Sí, documentación en línea',
-                        'Sí, tutoriales en video',
-                        'No',
-                        'En desarrollo'
+                        'Documentación técnica',
+                        'Tutoriales en video',
+                        'Manuales PDF',
+                        'Guía de solución de problemas',
+                        'FAQ',
+                        'Nada'
                     ]
                 },
                 {
                     type: 'radio',
-                    title: '¿Hay tutoriales en video o materiales de capacitación disponibles?',
-                    reason: 'Sistema de ayuda integrado para usuarios.',
-                    options: ['Sí', 'No', 'Planificado']
-                },
-                {
-                    type: 'radio',
-                    title: '¿Estos materiales están disponibles digitalmente para integración en sistema?',
-                    reason: 'Sistema de ayuda integrado para usuarios.',
+                    title: '¿Hay materiales de capacitación en formato digital?',
                     options: ['Sí, todos', 'Parcialmente', 'No', 'Por solicitud']
                 },
                 {
-                    type: 'radio',
-                    title: '¿Existen problemas típicos y soluciones (guía de solución de problemas)?',
-                    reason: 'Sistema de ayuda integrado para usuarios.',
-                    options: ['Sí', 'No', 'En desarrollo']
+                    type: 'textarea',
+                    title: '¿Qué materiales adicionales puede proporcionar?',
+                    placeholder: 'Liste documentos, archivos, contactos disponibles...'
                 }
             ]
         };
@@ -1582,8 +1199,7 @@
                 finalText: 'Вы прошли все',
                 questions: 'вопросов',
                 downloadJSON: '💾 Скачать JSON',
-                downloadTXT: '📄 Скачать TXT',
-                reasonLabel: 'Зачем нам это:'
+                downloadTXT: '📄 Скачать TXT'
             },
             en: {
                 prevBtn: '↑ Back',
@@ -1597,8 +1213,7 @@
                 finalText: 'You completed all',
                 questions: 'questions',
                 downloadJSON: '💾 Download JSON',
-                downloadTXT: '📄 Download TXT',
-                reasonLabel: 'Why we need this:'
+                downloadTXT: '📄 Download TXT'
             },
             es: {
                 prevBtn: '↑ Atrás',
@@ -1612,8 +1227,7 @@
                 finalText: 'Completó todas',
                 questions: 'preguntas',
                 downloadJSON: '💾 Descargar JSON',
-                downloadTXT: '📄 Descargar TXT',
-                reasonLabel: 'Por qué necesitamos esto:'
+                downloadTXT: '📄 Descargar TXT'
             }
         };
 
@@ -1631,7 +1245,6 @@
                     <div class="question-content">
                         <div class="question-number">${t.questionOf} ${index + 1} ${t.of} ${currentQuestions.length}</div>
                         <h1 class="question-title">${q.title}</h1>
-                        <div class="question-reason"><strong>${t.reasonLabel}</strong> ${q.reason}</div>
                         ${renderAnswerInput(q, index)}
                     </div>
                 `;
@@ -1801,7 +1414,6 @@
                 totalQuestions: currentQuestions.length,
                 answers: currentQuestions.map((q, i) => ({
                     question: q.title,
-                    reason: q.reason,
                     type: q.type,
                     answer: answers[i] || null
                 }))
@@ -1821,7 +1433,6 @@
             
             currentQuestions.forEach((q, i) => {
                 text += `${i + 1}. ${q.title}\n`;
-                text += `${t.reasonLabel} ${q.reason}\n`;
                 text += '-'.repeat(60) + '\n';
                 const answer = answers[i];
                 if (Array.isArray(answer)) {
