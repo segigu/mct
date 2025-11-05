@@ -91,7 +91,7 @@
         }
 
         .question-slide {
-            height: calc(100vh - 80px);
+            height: calc(var(--vh, 1vh) * 100 - 80px);
             padding: 0 40px;
             display: flex;
             align-items: center;
@@ -1396,35 +1396,23 @@ const questions = {
             updateView();
         }
 
-        // Store initial viewport height to handle mobile keyboard issues
-        let initialViewportHeight = window.innerHeight;
+        // Fix for mobile: Set CSS variable for viewport height that won't change when keyboard opens
+        // This prevents content jumping when the mobile keyboard appears/disappears
+        function setViewportHeight() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+
+        // Store initial viewport height for slide calculations
+        let fixedSlideHeight = window.innerHeight - 80;
 
         function updateView() {
             const container = document.getElementById('questionsContainer');
             const totalQuestions = questions[currentLanguage].length;
             const t = translations[currentLanguage];
 
-            // Get actual slide height from the first slide element
-            // Use stored initial height if current height is significantly different (keyboard is likely open)
-            const firstSlide = container.querySelector('.question-slide');
-            let slideHeight;
-
-            if (firstSlide) {
-                // If viewport height has changed significantly (keyboard opened), use initial height
-                // This prevents layout shifts when keyboard is open
-                const currentHeight = window.innerHeight;
-                if (Math.abs(currentHeight - initialViewportHeight) > 100) {
-                    slideHeight = initialViewportHeight - 80;
-                } else {
-                    slideHeight = firstSlide.offsetHeight;
-                    // Update initial height reference when stable
-                    initialViewportHeight = currentHeight;
-                }
-            } else {
-                slideHeight = initialViewportHeight - 80;
-            }
-
-            container.style.transform = `translateY(-${currentQuestion * slideHeight}px)`;
+            // Always use the fixed slide height to prevent layout shifts when keyboard opens
+            container.style.transform = `translateY(-${currentQuestion * fixedSlideHeight}px)`;
 
             // Update progress
             const progress = ((currentQuestion) / (totalQuestions + 1)) * 100;
@@ -1523,30 +1511,17 @@ const questions = {
             }
         });
 
-        // Handle window resize to recalculate slide positions
-        window.addEventListener('resize', () => {
-            updateView();
-        });
+        // Set initial viewport height on load
+        setViewportHeight();
 
-        // Fix for mobile keyboard: recalculate layout when input fields lose focus
-        // This ensures the layout returns to normal when the keyboard closes
-        document.addEventListener('focusout', (e) => {
-            if (e.target.matches('.answer-input')) {
-                // Use setTimeout to allow the keyboard to fully close before recalculating
-                setTimeout(() => {
-                    updateView();
-                }, 150);
-            }
-        });
-
-        // Also handle when input fields gain focus for better stability
-        document.addEventListener('focusin', (e) => {
-            if (e.target.matches('.answer-input')) {
-                // Small delay to allow keyboard animation to complete
-                setTimeout(() => {
-                    updateView();
-                }, 100);
-            }
+        // Update viewport height and recalculate on orientation change only
+        // Don't update on regular resize to prevent keyboard-induced layout shifts
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                setViewportHeight();
+                fixedSlideHeight = window.innerHeight - 80;
+                updateView();
+            }, 100);
         });
 
         // Initialize
