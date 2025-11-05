@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Keyboard Debug</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #log {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            color: #0f0;
+            font-size: 10px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10000;
+            font-family: monospace;
+        }
+        #content {
+            margin-top: 220px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        textarea {
+            min-height: 100px;
+        }
+        .info {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="log"></div>
+    <div id="content">
+        <h2>Mobile Keyboard Debug</h2>
+
+        <div class="info">
+            <div>Screen: <span id="screen"></span></div>
+            <div>Window: <span id="window"></span></div>
+            <div>Visual VP: <span id="visual"></span></div>
+            <div>Scroll: <span id="scroll"></span></div>
+        </div>
+
+        <input type="text" placeholder="Test text input">
+
+        <textarea placeholder="Test textarea"></textarea>
+
+        <div style="height: 1000px; background: linear-gradient(white, lightblue);">
+            Long content to test scrolling
+        </div>
+    </div>
+
+    <script>
+        const logEl = document.getElementById('log');
+        const logs = [];
+
+        function log(msg) {
+            const time = new Date().toLocaleTimeString();
+            logs.push(`[${time}] ${msg}`);
+            if (logs.length > 20) logs.shift();
+            logEl.innerHTML = logs.join('<br>');
+            console.log(msg);
+        }
+
+        function updateInfo() {
+            document.getElementById('screen').textContent =
+                `${screen.width}x${screen.height}`;
+            document.getElementById('window').textContent =
+                `${window.innerWidth}x${window.innerHeight}`;
+            document.getElementById('visual').textContent =
+                window.visualViewport ?
+                `${Math.round(window.visualViewport.width)}x${Math.round(window.visualViewport.height)}` :
+                'N/A';
+            document.getElementById('scroll').textContent =
+                `x:${window.scrollX} y:${window.scrollY}`;
+        }
+
+        // Log initial state
+        log('🚀 Page loaded');
+        log(`Screen: ${screen.width}x${screen.height}`);
+        log(`Window: ${window.innerWidth}x${window.innerHeight}`);
+        log(`Visual VP: ${window.visualViewport ? 'supported' : 'NOT supported'}`);
+        updateInfo();
+
+        // Track all inputs
+        document.querySelectorAll('input, textarea').forEach(input => {
+            input.addEventListener('focus', (e) => {
+                log(`👆 FOCUS on ${e.target.tagName}`);
+                log(`  Window: ${window.innerWidth}x${window.innerHeight}`);
+                if (window.visualViewport) {
+                    log(`  Visual: ${Math.round(window.visualViewport.width)}x${Math.round(window.visualViewport.height)}`);
+                }
+                log(`  Scroll: ${window.scrollX}, ${window.scrollY}`);
+                updateInfo();
+            });
+
+            input.addEventListener('blur', (e) => {
+                log(`👇 BLUR on ${e.target.tagName}`);
+                log(`  Window: ${window.innerWidth}x${window.innerHeight}`);
+                if (window.visualViewport) {
+                    log(`  Visual: ${Math.round(window.visualViewport.width)}x${Math.round(window.visualViewport.height)}`);
+                }
+                log(`  Scroll: ${window.scrollX}, ${window.scrollY}`);
+                setTimeout(() => {
+                    log(`  Scroll after 300ms: ${window.scrollX}, ${window.scrollY}`);
+                    updateInfo();
+                }, 300);
+            });
+        });
+
+        // Track window resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                log(`📐 RESIZE: ${window.innerWidth}x${window.innerHeight}`);
+                updateInfo();
+            }, 100);
+        });
+
+        // Track visual viewport
+        if (window.visualViewport) {
+            let lastVVHeight = window.visualViewport.height;
+
+            window.visualViewport.addEventListener('resize', () => {
+                const currentHeight = window.visualViewport.height;
+                const diff = currentHeight - lastVVHeight;
+
+                log(`📱 Visual VP resize: ${Math.round(currentHeight)} (${diff > 0 ? '+' : ''}${Math.round(diff)})`);
+                log(`  Window scroll: ${window.scrollX}, ${window.scrollY}`);
+
+                if (diff > 100) {
+                    log('  ✅ Keyboard likely CLOSED');
+                } else if (diff < -100) {
+                    log('  ⌨️  Keyboard likely OPENED');
+                }
+
+                lastVVHeight = currentHeight;
+                updateInfo();
+            });
+
+            window.visualViewport.addEventListener('scroll', () => {
+                log(`📜 Visual VP scroll: ${window.visualViewport.offsetLeft}, ${window.visualViewport.offsetTop}`);
+            });
+        }
+
+        // Track document scroll
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                log(`📜 Window scroll: ${window.scrollX}, ${window.scrollY}`);
+                updateInfo();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

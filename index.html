@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Cache busting: prevent browser from caching this page -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>MCT Unit Survey</title>
     <style>
         * {
@@ -91,7 +95,7 @@
         }
 
         .question-slide {
-            height: calc(100vh - 80px);
+            height: calc(var(--vh, 1vh) * 100 - 80px);
             padding: 0 40px;
             display: flex;
             align-items: center;
@@ -319,6 +323,20 @@
             gap: 8px;
         }
 
+        .version-badge {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-size: 11px;
+            border-radius: 4px;
+            font-family: monospace;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
         .enter-key {
             padding: 4px 8px;
             background: #f5f5f5;
@@ -477,7 +495,23 @@
         Нажмите <span class="enter-key">Enter</span> или <span class="enter-key">↓</span> для продолжения
     </div>
 
+    <!-- Version badge for cache verification -->
+    <div class="version-badge" id="versionBadge"></div>
+
     <script>
+        // Set version with current timestamp for cache verification
+        const BUILD_VERSION = '2025-11-05 06:55 UTC';
+        const BUILD_TIMESTAMP = Date.now();
+
+        // Display version on page
+        document.getElementById('versionBadge').textContent = `v${BUILD_VERSION}`;
+
+        // Log version to console for debugging
+        console.log('%c🚀 MCT Survey Loaded', 'font-size: 16px; font-weight: bold; color: #CC785C;');
+        console.log(`Version: ${BUILD_VERSION}`);
+        console.log(`Timestamp: ${BUILD_TIMESTAMP}`);
+        console.log(`Cache: ${document.querySelector('[http-equiv="Cache-Control"]') ? 'disabled' : 'enabled'}`);
+
         let currentQuestion = 0;
         let currentLanguage = 'ru';
         const answers = {};
@@ -1396,28 +1430,36 @@ const questions = {
             updateView();
         }
 
+        // Fix for mobile: Set CSS variable for viewport height that won't change when keyboard opens
+        // This prevents content jumping when the mobile keyboard appears/disappears
+        function setViewportHeight() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+
+        // Store initial viewport height for slide calculations
+        let fixedSlideHeight = window.innerHeight - 80;
+
         function updateView() {
             const container = document.getElementById('questionsContainer');
             const totalQuestions = questions[currentLanguage].length;
             const t = translations[currentLanguage];
 
-            // Get actual slide height from the first slide element
-            const firstSlide = container.querySelector('.question-slide');
-            const slideHeight = firstSlide ? firstSlide.offsetHeight : (window.innerHeight - 80);
-            container.style.transform = `translateY(-${currentQuestion * slideHeight}px)`;
+            // Always use the fixed slide height to prevent layout shifts when keyboard opens
+            container.style.transform = `translateY(-${currentQuestion * fixedSlideHeight}px)`;
 
             // Update progress
             const progress = ((currentQuestion) / (totalQuestions + 1)) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
-            
+
             // Update buttons
             document.getElementById('prevBtn').disabled = currentQuestion === 0;
             document.querySelector('.nav-text').textContent = t.prevBtn;
             document.querySelectorAll('.nav-text')[1].textContent = t.nextBtn;
-            
+
             const nextBtn = document.getElementById('nextBtn');
             const enterHint = document.querySelector('.enter-hint');
-            
+
             if (currentQuestion >= totalQuestions) {
                 nextBtn.style.display = 'none';
                 enterHint.style.display = 'none';
@@ -1503,10 +1545,81 @@ const questions = {
             }
         });
 
-        // Handle window resize to recalculate slide positions
-        window.addEventListener('resize', () => {
-            updateView();
+        // Set initial viewport height on load
+        setViewportHeight();
+
+        // Update viewport height and recalculate on orientation change only
+        // Don't update on regular resize to prevent keyboard-induced layout shifts
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                setViewportHeight();
+                fixedSlideHeight = window.innerHeight - 80;
+                updateView();
+            }, 100);
         });
+
+        // Fix: Reset scroll position when keyboard closes
+        // This handles the case where browser auto-scrolls content when keyboard opens
+        // but doesn't scroll back when keyboard closes
+        let lastViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+
+        function handleViewportChange() {
+            if (!window.visualViewport) return;
+
+            const currentHeight = window.visualViewport.height;
+            const offsetTop = window.visualViewport.offsetTop;
+
+            // Compensate for visual viewport offset in the transform
+            // This keeps content in place when keyboard opens/closes
+            const container = document.getElementById('questionsContainer');
+            if (container) {
+                const baseTransform = currentQuestion * fixedSlideHeight;
+                // Subtract offsetTop to compensate for browser's automatic pan
+                container.style.transform = `translateY(-${baseTransform - offsetTop}px)`;
+            }
+
+            // If viewport height increased significantly, keyboard likely closed
+            if (currentHeight > lastViewportHeight + 100) {
+                // Reset scroll on all question slides
+                document.querySelectorAll('.question-slide').forEach(slide => {
+                    slide.scrollTop = 0;
+                });
+
+                // Also reset body scroll
+                window.scrollTo(0, 0);
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }
+
+            lastViewportHeight = currentHeight;
+        }
+
+        // Use Visual Viewport API if available (better for mobile)
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', handleViewportChange);
+            window.visualViewport.addEventListener('scroll', handleViewportChange);
+        }
+
+        // Fallback: also handle blur on input fields
+        document.addEventListener('blur', (e) => {
+            if (e.target.matches('.answer-input')) {
+                setTimeout(() => {
+                    // Reset scroll positions
+                    document.querySelectorAll('.question-slide').forEach(slide => {
+                        slide.scrollTop = 0;
+                    });
+                    window.scrollTo(0, 0);
+                    document.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
+
+                    // Reset transform to base position
+                    const container = document.getElementById('questionsContainer');
+                    if (container) {
+                        container.style.transform = `translateY(-${currentQuestion * fixedSlideHeight}px)`;
+                    }
+                }, 300);
+            }
+        }, true);
 
         // Initialize
         initSurvey();
