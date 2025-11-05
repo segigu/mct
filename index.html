@@ -1524,6 +1524,52 @@ const questions = {
             }, 100);
         });
 
+        // Fix: Reset scroll position when keyboard closes
+        // This handles the case where browser auto-scrolls content when keyboard opens
+        // but doesn't scroll back when keyboard closes
+        let lastViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+
+        function handleViewportChange() {
+            if (!window.visualViewport) return;
+
+            const currentHeight = window.visualViewport.height;
+
+            // If viewport height increased significantly, keyboard likely closed
+            if (currentHeight > lastViewportHeight + 100) {
+                // Reset scroll on all question slides
+                document.querySelectorAll('.question-slide').forEach(slide => {
+                    slide.scrollTop = 0;
+                });
+
+                // Also reset body scroll
+                window.scrollTo(0, 0);
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }
+
+            lastViewportHeight = currentHeight;
+        }
+
+        // Use Visual Viewport API if available (better for mobile)
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', handleViewportChange);
+        }
+
+        // Fallback: also handle blur on input fields
+        document.addEventListener('blur', (e) => {
+            if (e.target.matches('.answer-input')) {
+                setTimeout(() => {
+                    // Reset scroll positions
+                    document.querySelectorAll('.question-slide').forEach(slide => {
+                        slide.scrollTop = 0;
+                    });
+                    window.scrollTo(0, 0);
+                    document.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
+                }, 300);
+            }
+        }, true);
+
         // Initialize
         initSurvey();
     </script>
