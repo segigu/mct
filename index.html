@@ -22,6 +22,12 @@
             overflow: hidden;
         }
 
+        body.keyboard-open {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
         .header {
             position: fixed;
             top: 0;
@@ -500,7 +506,7 @@
 
     <script>
         // Set version with current timestamp for cache verification
-        const BUILD_VERSION = '2025-11-05 08:30 UTC';
+        const BUILD_VERSION = '2025-11-05 08:35 UTC';
         const BUILD_TIMESTAMP = Date.now();
 
         // Display version on page
@@ -1616,9 +1622,11 @@ const questions = {
             if (currentHeight < lastViewportHeight - 100) {
                 // Keyboard opened
                 isKeyboardOpen = true;
+                document.body.classList.add('keyboard-open');
             } else if (currentHeight > lastViewportHeight + 100) {
                 // Keyboard closed
                 isKeyboardOpen = false;
+                document.body.classList.remove('keyboard-open');
 
                 // Reset scroll on all question slides
                 document.querySelectorAll('.question-slide').forEach(slide => {
@@ -1650,6 +1658,7 @@ const questions = {
         document.addEventListener('focus', (e) => {
             if (e.target.matches('.answer-input')) {
                 isKeyboardOpen = true;
+                document.body.classList.add('keyboard-open');
                 // Prevent default browser scroll behavior
                 setTimeout(() => {
                     // Scroll the input into view within its slide container
@@ -1666,6 +1675,7 @@ const questions = {
         document.addEventListener('blur', (e) => {
             if (e.target.matches('.answer-input')) {
                 isKeyboardOpen = false;
+                document.body.classList.remove('keyboard-open');
                 setTimeout(() => {
                     // Reset scroll positions
                     document.querySelectorAll('.question-slide').forEach(slide => {
@@ -1684,13 +1694,27 @@ const questions = {
             }
         }, true);
 
-        // Block scroll when keyboard is open
+        // Block scroll when keyboard is open - more aggressive approach
         document.addEventListener('touchmove', (e) => {
             if (isKeyboardOpen) {
-                // Allow scrolling only within the input field's container
-                if (!e.target.closest('.question-content')) {
+                // Only allow touchmove on textarea elements (they might need scrolling)
+                // Block everything else to prevent accidental navigation
+                const isTextarea = e.target.tagName === 'TEXTAREA';
+                if (!isTextarea) {
                     e.preventDefault();
+                    e.stopPropagation();
+                    return false;
                 }
+            }
+        }, { passive: false });
+
+        // Also prevent scroll events when keyboard is open
+        document.addEventListener('scroll', (e) => {
+            if (isKeyboardOpen) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.scrollTo(0, 0);
+                return false;
             }
         }, { passive: false });
 
