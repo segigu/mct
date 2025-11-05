@@ -500,7 +500,7 @@
 
     <script>
         // Set version with current timestamp for cache verification
-        const BUILD_VERSION = '2025-11-05 08:10 UTC';
+        const BUILD_VERSION = '2025-11-05 08:15 UTC';
         const BUILD_TIMESTAMP = Date.now();
 
         // Display version on page
@@ -1563,8 +1563,9 @@ const questions = {
         // Set initial viewport height on load
         setViewportHeight();
 
-        // Track window width to distinguish real resize from keyboard opening
+        // Track window dimensions to distinguish real resize from keyboard opening
         let lastWindowWidth = window.innerWidth;
+        let lastWindowHeight = window.innerHeight;
 
         // Update viewport height and recalculate on orientation change only
         // Don't update on regular resize to prevent keyboard-induced layout shifts
@@ -1573,20 +1574,28 @@ const questions = {
                 setViewportHeight();
                 updateFixedSlideHeight();
                 lastWindowWidth = window.innerWidth;
+                lastWindowHeight = window.innerHeight;
                 updateView();
             }, 100);
         });
 
-        // Also handle window resize, but only if width changed (not keyboard)
-        // This fixes issue when user resizes browser window
+        // Also handle window resize, but only if width or height changed significantly
+        // On mobile with visualViewport, ignore height-only changes (likely keyboard)
         window.addEventListener('resize', () => {
             const currentWidth = window.innerWidth;
-            // Only recalculate if width changed (real resize, not keyboard)
-            if (Math.abs(currentWidth - lastWindowWidth) > 10) {
+            const currentHeight = window.innerHeight;
+            const widthChanged = Math.abs(currentWidth - lastWindowWidth) > 10;
+            const heightChanged = Math.abs(currentHeight - lastWindowHeight) > 50;
+
+            // If width changed OR height changed (but not on mobile where it could be keyboard)
+            const shouldUpdate = widthChanged || (heightChanged && !window.visualViewport);
+
+            if (shouldUpdate) {
                 setViewportHeight();
                 setTimeout(() => {
                     updateFixedSlideHeight();
                     lastWindowWidth = currentWidth;
+                    lastWindowHeight = currentHeight;
                     updateView();
                 }, 0);
             }
