@@ -477,8 +477,8 @@
         </button>
     </div>
 
-    <div class="enter-hint">
-        Нажмите <span class="enter-key">Enter</span> или <span class="enter-key">↓</span> для продолжения
+    <div class="enter-hint" id="enterHint">
+        <span id="enterHintText"></span>
     </div>
 
     <script>
@@ -1241,6 +1241,8 @@ const questions = {
                 enterHint: 'Нажмите',
                 or: 'или',
                 toContinue: 'для продолжения',
+                textareaHint: 'Shift+Enter для новой строки, Enter для продолжения',
+                inputHint: 'Нажмите Enter для продолжения',
                 finalTitle: 'Спасибо за ваши ответы! 🎉',
                 finalText: 'Вы прошли все',
                 questions: 'вопросов',
@@ -1255,6 +1257,8 @@ const questions = {
                 enterHint: 'Press',
                 or: 'or',
                 toContinue: 'to continue',
+                textareaHint: 'Shift+Enter for new line, Enter to continue',
+                inputHint: 'Press Enter to continue',
                 finalTitle: 'Thank you for your answers! 🎉',
                 finalText: 'You completed all',
                 questions: 'questions',
@@ -1269,6 +1273,8 @@ const questions = {
                 enterHint: 'Presione',
                 or: 'o',
                 toContinue: 'para continuar',
+                textareaHint: 'Shift+Enter para nueva línea, Enter para continuar',
+                inputHint: 'Presione Enter para continuar',
                 finalTitle: '¡Gracias por sus respuestas! 🎉',
                 finalText: 'Completó todas',
                 questions: 'preguntas',
@@ -1276,6 +1282,14 @@ const questions = {
                 downloadTXT: '📄 Descargar TXT'
             }
         };
+
+        function updateEnterHint() {
+            const t = translations[currentLanguage];
+            const enterHintText = document.getElementById('enterHintText');
+            if (enterHintText) {
+                enterHintText.innerHTML = `${t.enterHint} <span class="enter-key">Enter</span> ${t.or} <span class="enter-key">↓</span> ${t.toContinue}`;
+            }
+        }
 
         function initSurvey() {
             const container = document.getElementById('questionsContainer');
@@ -1291,7 +1305,7 @@ const questions = {
                     <div class="question-content">
                         <div class="question-number">${t.questionOf} ${index + 1} ${t.of} ${currentQuestions.length}</div>
                         <h1 class="question-title">${q.title}</h1>
-                        ${renderAnswerInput(q, index)}
+                        ${renderAnswerInput(q, index, t)}
                     </div>
                 `;
                 container.appendChild(slide);
@@ -1317,11 +1331,14 @@ const questions = {
                 updateFixedSlideHeight();
                 updateView();
             }, 0);
+
+            // Update enter hint with current language
+            updateEnterHint();
         }
 
-        function renderAnswerInput(question, index) {
+        function renderAnswerInput(question, index, t) {
             const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            
+
             if (question.type === 'radio') {
                 return `
                     <div class="options">
@@ -1346,20 +1363,20 @@ const questions = {
                 `;
             } else if (question.type === 'textarea') {
                 return `
-                    <textarea class="answer-input" 
+                    <textarea class="answer-input"
                               placeholder="${question.placeholder}"
                               oninput="saveAnswer(${index}, this.value)"
                               onkeydown="handleTextareaKey(event, ${index})">${answers[index] || ''}</textarea>
-                    <div class="hint">Shift+Enter для новой строки, Enter для продолжения</div>
+                    <div class="hint">${t.textareaHint}</div>
                 `;
             } else {
                 return `
-                    <input type="text" class="answer-input" 
+                    <input type="text" class="answer-input"
                            placeholder="${question.placeholder}"
                            value="${answers[index] || ''}"
                            oninput="saveAnswer(${index}, this.value)"
                            onkeydown="handleEnterKey(event)">
-                    <div class="hint">Нажмите Enter для продолжения</div>
+                    <div class="hint">${t.inputHint}</div>
                 `;
             }
         }
