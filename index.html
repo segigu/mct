@@ -500,7 +500,7 @@
 
     <script>
         // Set version with current timestamp for cache verification
-        const BUILD_VERSION = '2025-11-05 08:05 UTC';
+        const BUILD_VERSION = '2025-11-05 08:10 UTC';
         const BUILD_TIMESTAMP = Date.now();
 
         // Display version on page
@@ -1300,9 +1300,9 @@ const questions = {
             const container = document.getElementById('questionsContainer');
             const currentQuestions = questions[currentLanguage];
             const t = translations[currentLanguage];
-            
+
             container.innerHTML = '';
-            
+
             currentQuestions.forEach((q, index) => {
                 const slide = document.createElement('div');
                 slide.className = 'question-slide';
@@ -1315,7 +1315,7 @@ const questions = {
                 `;
                 container.appendChild(slide);
             });
-            
+
             // Add final screen
             const finalSlide = document.createElement('div');
             finalSlide.className = 'question-slide';
@@ -1330,8 +1330,12 @@ const questions = {
                 </div>
             `;
             container.appendChild(finalSlide);
-            
-            updateView();
+
+            // Update fixed slide height after DOM is rendered
+            setTimeout(() => {
+                updateFixedSlideHeight();
+                updateView();
+            }, 0);
         }
 
         function renderAnswerInput(question, index) {
@@ -1438,7 +1442,18 @@ const questions = {
         }
 
         // Store initial viewport height for slide calculations
-        let fixedSlideHeight = window.innerHeight - 80;
+        // Use actual DOM element height instead of calculation to avoid mismatches
+        let fixedSlideHeight = 0;
+
+        function updateFixedSlideHeight() {
+            const firstSlide = document.querySelector('.question-slide');
+            if (firstSlide) {
+                fixedSlideHeight = firstSlide.offsetHeight;
+            } else {
+                // Fallback if no slide found
+                fixedSlideHeight = window.innerHeight - 80;
+            }
+        }
 
         function updateView() {
             const container = document.getElementById('questionsContainer');
@@ -1556,7 +1571,7 @@ const questions = {
         window.addEventListener('orientationchange', () => {
             setTimeout(() => {
                 setViewportHeight();
-                fixedSlideHeight = window.innerHeight - 80;
+                updateFixedSlideHeight();
                 lastWindowWidth = window.innerWidth;
                 updateView();
             }, 100);
@@ -1569,9 +1584,11 @@ const questions = {
             // Only recalculate if width changed (real resize, not keyboard)
             if (Math.abs(currentWidth - lastWindowWidth) > 10) {
                 setViewportHeight();
-                fixedSlideHeight = window.innerHeight - 80;
-                lastWindowWidth = currentWidth;
-                updateView();
+                setTimeout(() => {
+                    updateFixedSlideHeight();
+                    lastWindowWidth = currentWidth;
+                    updateView();
+                }, 0);
             }
         });
 
