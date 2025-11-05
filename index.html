@@ -23,9 +23,15 @@
         }
 
         body.keyboard-open {
-            position: fixed;
-            width: 100%;
-            height: 100%;
+            overflow: hidden;
+        }
+
+        body.keyboard-open .questions-container {
+            overflow: hidden;
+        }
+
+        body.keyboard-open .question-slide {
+            overflow: visible;
         }
 
         .header {
@@ -506,7 +512,7 @@
 
     <script>
         // Set version with current timestamp for cache verification
-        const BUILD_VERSION = '2025-11-05 08:35 UTC';
+        const BUILD_VERSION = '2025-11-05 08:40 UTC';
         const BUILD_TIMESTAMP = Date.now();
 
         // Display version on page
@@ -1659,15 +1665,31 @@ const questions = {
             if (e.target.matches('.answer-input')) {
                 isKeyboardOpen = true;
                 document.body.classList.add('keyboard-open');
-                // Prevent default browser scroll behavior
+
+                // Use visualViewport to properly position input above keyboard
                 setTimeout(() => {
-                    // Scroll the input into view within its slide container
-                    e.target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center',
-                        inline: 'nearest'
-                    });
-                }, 100);
+                    if (window.visualViewport) {
+                        const inputRect = e.target.getBoundingClientRect();
+                        const viewportHeight = window.visualViewport.height;
+                        const inputBottom = inputRect.bottom;
+
+                        // If input is below visible viewport, scroll it into view
+                        if (inputBottom > viewportHeight) {
+                            const currentSlide = e.target.closest('.question-slide');
+                            if (currentSlide) {
+                                const scrollAmount = inputBottom - viewportHeight + 20; // 20px padding
+                                currentSlide.scrollTop += scrollAmount;
+                            }
+                        }
+                    } else {
+                        // Fallback for browsers without visualViewport
+                        e.target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center',
+                            inline: 'nearest'
+                        });
+                    }
+                }, 300); // Wait for keyboard animation
             }
         }, true);
 
@@ -1694,27 +1716,20 @@ const questions = {
             }
         }, true);
 
-        // Block scroll when keyboard is open - more aggressive approach
+        // Block scroll when keyboard is open - but allow scrolling within current slide
         document.addEventListener('touchmove', (e) => {
             if (isKeyboardOpen) {
-                // Only allow touchmove on textarea elements (they might need scrolling)
-                // Block everything else to prevent accidental navigation
+                // Allow scrolling within the question-slide (for long content)
+                const isWithinSlide = e.target.closest('.question-slide');
                 const isTextarea = e.target.tagName === 'TEXTAREA';
-                if (!isTextarea) {
+
+                // Block horizontal scroll and navigation between slides
+                // Allow vertical scroll within current slide
+                if (!isWithinSlide && !isTextarea) {
                     e.preventDefault();
                     e.stopPropagation();
                     return false;
                 }
-            }
-        }, { passive: false });
-
-        // Also prevent scroll events when keyboard is open
-        document.addEventListener('scroll', (e) => {
-            if (isKeyboardOpen) {
-                e.preventDefault();
-                e.stopPropagation();
-                window.scrollTo(0, 0);
-                return false;
             }
         }, { passive: false });
 
