@@ -500,7 +500,7 @@
 
     <script>
         // Set version with current timestamp for cache verification
-        const BUILD_VERSION = '2025-11-05 08:45 UTC';
+        const BUILD_VERSION = '2025-11-05 08:50 UTC';
         const BUILD_TIMESTAMP = Date.now();
 
         // Display version on page
@@ -1663,10 +1663,11 @@ const questions = {
                         const inputTop = inputRect.top;
                         const inputHeight = inputRect.height;
 
-                        // Position input in the top third of visible viewport
-                        const targetPosition = viewportHeight / 3;
+                        // Position input slightly above center (40% from top)
+                        // This gives good visibility without being too high
+                        const targetPosition = viewportHeight * 0.4;
 
-                        if (inputTop > targetPosition) {
+                        if (inputTop > targetPosition || inputTop < 100) {
                             // Calculate how much to shift container up
                             keyboardAdjustment = inputTop - targetPosition;
 
@@ -1680,7 +1681,7 @@ const questions = {
                         // Fallback for browsers without visualViewport
                         e.target.scrollIntoView({
                             behavior: 'smooth',
-                            block: 'start'
+                            block: 'center'
                         });
                     }
                 }, 300); // Wait for keyboard animation
@@ -1710,20 +1711,26 @@ const questions = {
             }
         }, true);
 
-        // Block scroll when keyboard is open - but allow scrolling within current slide
+        // Block ALL scroll when keyboard is open
         document.addEventListener('touchmove', (e) => {
             if (isKeyboardOpen) {
-                // Allow scrolling within the question-slide (for long content)
-                const isWithinSlide = e.target.closest('.question-slide');
+                // Only allow scrolling on textarea (for long text input)
                 const isTextarea = e.target.tagName === 'TEXTAREA';
 
-                // Block horizontal scroll and navigation between slides
-                // Allow vertical scroll within current slide
-                if (!isWithinSlide && !isTextarea) {
+                if (!isTextarea) {
                     e.preventDefault();
                     e.stopPropagation();
                     return false;
                 }
+            }
+        }, { passive: false });
+
+        // Also block wheel events (for trackpad/mouse)
+        document.addEventListener('wheel', (e) => {
+            if (isKeyboardOpen) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
             }
         }, { passive: false });
 
