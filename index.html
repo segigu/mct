@@ -500,7 +500,7 @@
 
     <script>
         // Set version with current timestamp for cache verification
-        const BUILD_VERSION = '2025-11-05 06:55 UTC';
+        const BUILD_VERSION = '2025-11-05 08:00 UTC';
         const BUILD_TIMESTAMP = Date.now();
 
         // Display version on page
@@ -1567,16 +1567,6 @@ const questions = {
             if (!window.visualViewport) return;
 
             const currentHeight = window.visualViewport.height;
-            const offsetTop = window.visualViewport.offsetTop;
-
-            // Compensate for visual viewport offset in the transform
-            // This keeps content in place when keyboard opens/closes
-            const container = document.getElementById('questionsContainer');
-            if (container) {
-                const baseTransform = currentQuestion * fixedSlideHeight;
-                // Subtract offsetTop to compensate for browser's automatic pan
-                container.style.transform = `translateY(-${baseTransform - offsetTop}px)`;
-            }
 
             // If viewport height increased significantly, keyboard likely closed
             if (currentHeight > lastViewportHeight + 100) {
@@ -1589,6 +1579,12 @@ const questions = {
                 window.scrollTo(0, 0);
                 document.body.scrollTop = 0;
                 document.documentElement.scrollTop = 0;
+
+                // Reset transform to base position
+                const container = document.getElementById('questionsContainer');
+                if (container) {
+                    container.style.transform = `translateY(-${currentQuestion * fixedSlideHeight}px)`;
+                }
             }
 
             lastViewportHeight = currentHeight;
